@@ -3,7 +3,18 @@
     <style name="Base.Theme.RecipeApp" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Customize your light theme here. -->
         <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+<!--        <item name="android:windowSplashScreenBackground">@color/material_dynamic_tertiary70</item>-->
+<!--        <item name="windowSplashScreenAnimatedIcon">@drawable/img</item>-->
+<!--        <item name="windowSplashScreenAnimationDuration">3000</item>-->
+<!--        <item name="windowSplashScreenIconBackgroundColor">@color/material_dynamic_tertiary70</item>-->
     </style>
 
     <style name="Theme.RecipeApp" parent="Base.Theme.RecipeApp" />
+    <style name="Theme.App.Starting" parent="Theme.SplashScreen">
+        <item name="android:windowSplashScreenBackground">@color/material_dynamic_tertiary70</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/img</item>
+        <item name="windowSplashScreenAnimationDuration">3000</item>
+        <item name="windowSplashScreenIconBackgroundColor">@color/material_dynamic_tertiary70</item>
+        <item name="postSplashScreenTheme">@style/Base.Theme.RecipeApp</item>
+    </style>
 </resources>

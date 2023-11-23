@@ -1,6 +1,7 @@
 package com.example.recipeapp.data.remote.api
 
 import com.example.recipeapp.data.remote.response.CategoryResponse
+import com.example.recipeapp.data.remote.response.DetailResponse
 import com.example.recipeapp.data.remote.response.RecipeResponse
 import retrofit2.Call
 import retrofit2.http.GET
@@ -14,5 +15,8 @@ interface ApiService {
     fun getListRecipe(
         @Query("c") c:String?
     ):Call<RecipeResponse>
-
+    @GET("lookup.php")
+    fun getDetailMeals(
+        @Query("i") i:String?
+    ):Call<DetailResponse>
 }

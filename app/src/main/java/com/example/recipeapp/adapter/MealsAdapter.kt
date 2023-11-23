@@ -9,10 +9,15 @@ import com.example.recipeapp.databinding.ItemRecipeBinding
 
 class MealsAdapter(private val list: ArrayList<MealsItem>) :
     RecyclerView.Adapter<MealsAdapter.ViewHolder>() {
+    private var onItemClickCallback : OnItemClickCallback?=null
+
     inner class ViewHolder(private var binding: ItemRecipeBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun itemBind(data:MealsItem){
             binding.apply {
+                root.setOnClickListener {
+                    onItemClickCallback?.onItemClicked(data)
+                }
                 Glide.with(itemView)
                     .load(data.strMealThumb)
                     .into(imgRecipe)
@@ -34,5 +39,11 @@ class MealsAdapter(private val list: ArrayList<MealsItem>) :
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.itemBind(list[position])
+    }
+    interface OnItemClickCallback{
+        fun onItemClicked(data: MealsItem)
+    }
+    fun setOnItemClickCallback(onItemClickCallback: OnItemClickCallback){
+        this.onItemClickCallback = onItemClickCallback
     }
 }

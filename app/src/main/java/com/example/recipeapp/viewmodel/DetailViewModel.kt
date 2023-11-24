@@ -3,14 +3,16 @@ package com.example.recipeapp.viewmodel
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.example.recipeapp.data.local.entity.FavouriteEntity
 import com.example.recipeapp.data.remote.api.ApiConfig
 import com.example.recipeapp.data.remote.response.DetailResponse
 import com.example.recipeapp.data.remote.response.DetailsItem
+import com.example.recipeapp.repository.MealRepository
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class DetailViewModel : ViewModel() {
+class DetailViewModel (private val mealRepository: MealRepository): ViewModel() {
     private val _mealDetail = MutableLiveData<List<DetailsItem>>()
     val mealDetail: MutableLiveData<List<DetailsItem>> = _mealDetail
 
@@ -36,4 +38,6 @@ class DetailViewModel : ViewModel() {
             }
         })
     }
+    fun addFavourite(favouriteEntity: FavouriteEntity) = mealRepository.addToFavourite(favouriteEntity)
+    fun deleteFavourite(id:String)=mealRepository.deleteFavourite(id)
 }

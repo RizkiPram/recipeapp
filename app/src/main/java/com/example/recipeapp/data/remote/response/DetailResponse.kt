@@ -169,5 +169,7 @@ data class DetailsItem(
 	val strMeasure14: String?,
 
 	@field:SerializedName("strMeasure15")
-	val strMeasure15: String?
+	val strMeasure15: String?,
+
+	var isFavourited:Boolean,
 ) : Parcelable

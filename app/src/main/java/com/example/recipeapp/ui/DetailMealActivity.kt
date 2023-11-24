@@ -1,25 +1,55 @@
 package com.example.recipeapp.ui
 
 import android.os.Bundle
+import android.util.Log
+import android.webkit.WebSettings
+import android.webkit.WebView
+import android.webkit.WebViewClient
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
+import com.example.recipeapp.R
 import com.example.recipeapp.adapter.IngredientsAdapter
+import com.example.recipeapp.data.local.entity.FavouriteEntity
 import com.example.recipeapp.data.remote.response.DetailsItem
 import com.example.recipeapp.databinding.ActivityDetailMealBinding
 import com.example.recipeapp.viewmodel.DetailViewModel
+import com.example.recipeapp.viewmodel.ViewModelFactory
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+
 
 class DetailMealActivity : AppCompatActivity() {
     private lateinit var binding: ActivityDetailMealBinding
     private lateinit var dataItem: DetailsItem
-    var ingridientsItem = ArrayList<String>()
-    private val viewModel by viewModels<DetailViewModel>()
+    private var ingridientsItem = ArrayList<String>()
+    private var mealId=""
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityDetailMealBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        val mealId = intent.getStringExtra(MEAL_ID)
+        mealId = intent.getStringExtra(MEAL_ID).toString()
+        setupViewModel()
+
+        binding.apply {
+            imgBack.setOnClickListener { onBackPressed() }
+            webView.settings.javaScriptEnabled = true
+            webView.settings.loadWithOverviewMode=true
+            webView.settings.pluginState = WebSettings.PluginState.ON
+            webView.webViewClient = object : WebViewClient() {
+                override fun shouldOverrideUrlLoading(view: WebView, url: String): Boolean {
+                    return false
+                }
+            }
+        }
+    }
+    private fun setupViewModel(){
+        val factory: ViewModelFactory = ViewModelFactory.getInstance(this)
+        val viewModel: DetailViewModel by viewModels {
+            factory
+        }
         viewModel.getDetail(mealId)
         binding.apply {
             viewModel.mealDetail.observe(this@DetailMealActivity) {
@@ -77,7 +107,8 @@ class DetailMealActivity : AppCompatActivity() {
                         mealData.strMeasure16,
                         mealData.strMeasure17,
                         mealData.strMeasure14,
-                        mealData.strMeasure15
+                        mealData.strMeasure15,
+                        false
                     )
                 }
 
@@ -107,12 +138,52 @@ class DetailMealActivity : AppCompatActivity() {
                 tvArea.text = dataItem.strArea
                 tvCategory.text = dataItem.strCategory
                 tvTags.text = dataItem.strTags
-                setIngridientsData(ingridientsItem)
-            }
+                tvAppBar.text=dataItem.strMeal
+                val linkYoutube="<iframe height='95%' width='100%' src='\" + ${dataItem.strYoutube} + \"' frameborder='0' allowfullscreen></iframe>"
+                    webView.loadDataWithBaseURL(
+                        "https://www.youtube.com",
+                        linkYoutube,
+                        "text/html",
+                        "UTF-8",
+                        null
+                    )
 
+                setIngridientsData(ingridientsItem)
+                val favouriteEntity=FavouriteEntity(
+                    dataItem.strMealThumb,dataItem.idMeal,dataItem.strMeal
+                )
+                if (dataItem.isFavourited){
+                    Glide.with(this@DetailMealActivity)
+                        .load(R.drawable.baseline_favorite_24)
+                        .into(imgAddToFavourite)
+                }else{
+                    Glide.with(this@DetailMealActivity)
+                        .load(R.drawable.baseline_favorite_border_24)
+                        .into(imgAddToFavourite)
+                }
+                imgAddToFavourite.setOnClickListener {
+                    CoroutineScope(Dispatchers.IO).launch {
+                        if (dataItem.isFavourited){
+                            viewModel.deleteFavourite(dataItem.idMeal)
+                        }else{
+                            viewModel.addFavourite(favouriteEntity)
+                        }
+                    }
+                    dataItem.isFavourited = !dataItem.isFavourited
+                    if (dataItem.isFavourited){
+                        Glide.with(this@DetailMealActivity)
+                            .load(R.drawable.baseline_favorite_border_24)
+                            .into(imgAddToFavourite)
+                    }else{
+                        Glide.with(this@DetailMealActivity)
+                            .load(R.drawable.baseline_favorite_24)
+                            .into(imgAddToFavourite)
+                    }
+                    Log.d("isFavourite",dataItem.isFavourited.toString())
+                }
+            }
         }
     }
-
     private fun setIngridientsData(data: ArrayList<String>) {
         binding.rvIngredients.apply {
             adapter = IngredientsAdapter(data)
